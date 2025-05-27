@@ -96,7 +96,9 @@ func init() {
 	analyzeCmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to JSON configuration file (required)")
 	analyzeCmd.Flags().StringVarP(&outputPath, "output", "o", "", "Path to JSON output file (optional)")
 
-	analyzeCmd.MarkFlagRequired("config")
+	if err := analyzeCmd.MarkFlagRequired("config"); err != nil {
+		panic(fmt.Sprintf("Failed to mark config flag as required: %v", err))
+	}
 
 	analyzeCmd.Example = `  # Analyze logs with config file only
   loganalyzer analyze --config config.json
