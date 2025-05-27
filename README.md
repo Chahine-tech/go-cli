@@ -14,7 +14,7 @@ A powerful command-line tool written in Go for concurrent analysis of log files 
 
 ## 📋 Requirements
 
-- Go 1.19 or higher
+- Go 1.20 or higher
 - Access to log files you want to analyze
 
 ## 🛠 Installation
@@ -258,59 +258,3 @@ This project demonstrates:
 4. **JSON Processing**: Import/export of JSON data
 5. **Code Organization**: Modular design with internal packages
 6. **Documentation**: Comprehensive code and usage documentation
-
-## 👥 Team Information
-
-### Team Members
-
-- **[Your Name]** - Lead Developer
-  - Email: your.email@example.com
-  - GitHub: @yourusername
-  - Responsibilities: Project architecture, CLI interface, concurrency implementation
-
-- **[Team Member 2]** - Backend Developer  
-  - Email: member2@example.com
-  - GitHub: @member2
-  - Responsibilities: Error handling, JSON processing, testing
-
-- **[Team Member 3]** - Documentation & QA
-  - Email: member3@example.com
-  - GitHub: @member3
-  - Responsibilities: Documentation, testing, user experience
-
-### Project Timeline
-
-- **Week 1**: Project setup, architecture design, basic CLI structure
-- **Week 2**: Core functionality implementation, concurrency features
-- **Week 3**: Error handling, JSON processing, testing
-- **Week 4**: Documentation, final testing, deployment
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 🆘 Support
-
-If you encounter any problems or have questions:
-
-1. Check the documentation above
-2. Look at the example configurations in the `examples/` directory
-3. Run `loganalyzer --help` or `loganalyzer analyze --help`
-4. Create an issue in the project repository
-
-## 🎯 Future Enhancements
-
-- Support for different log formats (Apache, JSON logs, etc.)
-- Configuration validation improvements
-- Performance metrics and benchmarking
-- Plugin system for custom analyzers
-- Web interface for result visualization
-- Real-time log monitoring capabilities 
