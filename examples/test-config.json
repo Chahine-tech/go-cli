@@ -1,0 +1,17 @@
+[
+  {
+    "id": "go-mod",
+    "path": "./go.mod",
+    "type": "go module file"
+  },
+  {
+    "id": "readme",
+    "path": "./README.md",
+    "type": "documentation"
+  },
+  {
+    "id": "missing-file",
+    "path": "./non-existent-file.log",
+    "type": "test missing file"
+  }
+]

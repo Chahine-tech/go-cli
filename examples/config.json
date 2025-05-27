@@ -1,0 +1,22 @@
+[
+  {
+    "id": "web-server-1",
+    "path": "/var/log/nginx/access.log",
+    "type": "nginx access"
+  },
+  {
+    "id": "app-backend-2",
+    "path": "/var/log/my_app/errors.log",
+    "type": "custom application"
+  },
+  {
+    "id": "system-logs",
+    "path": "/var/log/syslog",
+    "type": "system log"
+  },
+  {
+    "id": "invalid-path",
+    "path": "/non/existent/log.log",
+    "type": "test error case"
+  }
+]
