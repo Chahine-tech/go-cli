@@ -53,7 +53,6 @@ func TestAddResult(t *testing.T) {
 func TestGetResults(t *testing.T) {
 	reporter := NewReporter()
 
-	// Add some test results
 	results := []AnalysisResult{
 		CreateSuccessResult("log1", "/var/log/test1.log"),
 		CreateFailureResult("log2", "/var/log/test2.log", "Test error", "Error details"),
@@ -76,7 +75,6 @@ func TestGetResults(t *testing.T) {
 }
 
 func TestSaveToFile(t *testing.T) {
-	// Create a temporary directory for test files
 	tempDir, err := os.MkdirTemp("", "loganalyzer-test")
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
@@ -85,7 +83,6 @@ func TestSaveToFile(t *testing.T) {
 
 	reporter := NewReporter()
 
-	// Add test results
 	results := []AnalysisResult{
 		CreateSuccessResult("log1", "/var/log/test1.log"),
 		CreateFailureResult("log2", "/var/log/test2.log", "Test error", "Error details"),
@@ -95,14 +92,12 @@ func TestSaveToFile(t *testing.T) {
 		reporter.AddResult(result)
 	}
 
-	// Test saving to file
 	outputPath := filepath.Join(tempDir, "results.json")
 	err = reporter.SaveToFile(outputPath)
 	if err != nil {
 		t.Errorf("SaveToFile() error = %v", err)
 	}
 
-	// Verify file contents
 	data, err := os.ReadFile(outputPath)
 	if err != nil {
 		t.Errorf("Failed to read saved file: %v", err)
@@ -117,7 +112,6 @@ func TestSaveToFile(t *testing.T) {
 		t.Errorf("Saved results count mismatch, got %d, want %d", len(savedResults), len(results))
 	}
 
-	// Test saving to invalid path
 	err = reporter.SaveToFile("/nonexistent/path/results.json")
 	if err == nil {
 		t.Error("SaveToFile() expected error for invalid path, got nil")

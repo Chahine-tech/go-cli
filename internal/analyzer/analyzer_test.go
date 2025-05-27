@@ -34,19 +34,16 @@ func TestNewAnalyzer(t *testing.T) {
 }
 
 func TestAnalyzeAllLogs(t *testing.T) {
-	// Create a temporary directory for test files
 	tempDir, err := os.MkdirTemp("", "loganalyzer-test")
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
 	defer os.RemoveAll(tempDir)
 
-	// Create test log files
 	log1Path := filepath.Join(tempDir, "test1.log")
 	log2Path := filepath.Join(tempDir, "test2.log")
 	log3Path := filepath.Join(tempDir, "nonexistent.log")
 
-	// Create valid log files
 	if err := os.WriteFile(log1Path, []byte("test log 1"), 0644); err != nil {
 		t.Fatalf("Failed to write test log 1: %v", err)
 	}
@@ -94,7 +91,7 @@ func TestAnalyzeAllLogs(t *testing.T) {
 					Type: "nginx",
 				},
 			},
-			expectError: false, // Should not error as we handle file errors gracefully
+			expectError: false,
 		},
 	}
 
@@ -117,20 +114,17 @@ func TestAnalyzeAllLogs(t *testing.T) {
 }
 
 func TestCheckFileAccess(t *testing.T) {
-	// Create a temporary directory for test files
 	tempDir, err := os.MkdirTemp("", "loganalyzer-test")
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
 	defer os.RemoveAll(tempDir)
 
-	// Create test files
 	validFile := filepath.Join(tempDir, "valid.log")
 	if err := os.WriteFile(validFile, []byte("test"), 0644); err != nil {
 		t.Fatalf("Failed to write test file: %v", err)
 	}
 
-	// Create a directory
 	dirPath := filepath.Join(tempDir, "dir")
 	if err := os.Mkdir(dirPath, 0755); err != nil {
 		t.Fatalf("Failed to create test directory: %v", err)

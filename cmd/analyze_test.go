@@ -3,8 +3,70 @@ package cmd
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+	"time"
 )
+
+func TestFormatOutputPath(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Empty path",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "Simple filename",
+			input:    "report.json",
+			expected: time.Now().Format("060102") + "_report.json",
+		},
+		{
+			name:     "Path with directory",
+			input:    "/path/to/report.json",
+			expected: filepath.Join("/path/to", time.Now().Format("060102")+"_report.json"),
+		},
+		{
+			name:     "Filename without extension",
+			input:    "report",
+			expected: time.Now().Format("060102") + "_report",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatOutputPath(tt.input)
+			if tt.input == "" {
+				if got != "" {
+					t.Errorf("formatOutputPath() = %v, want empty string", got)
+				}
+				return
+			}
+
+			// For non-empty paths, verify the format
+			if !strings.Contains(got, time.Now().Format("060102")) {
+				t.Errorf("formatOutputPath() output %v does not contain timestamp", got)
+			}
+
+			// Verify the base filename is preserved
+			baseGot := filepath.Base(got)
+			baseExpected := filepath.Base(tt.expected)
+			if baseGot != baseExpected {
+				t.Errorf("formatOutputPath() base filename = %v, want %v", baseGot, baseExpected)
+			}
+
+			// Verify the directory is preserved
+			dirGot := filepath.Dir(got)
+			dirExpected := filepath.Dir(tt.input)
+			if dirGot != dirExpected {
+				t.Errorf("formatOutputPath() directory = %v, want %v", dirGot, dirExpected)
+			}
+		})
+	}
+}
 
 func TestAnalyzeCommand(t *testing.T) {
 	// Create a temporary directory for test files
@@ -77,6 +139,14 @@ func TestAnalyzeCommand(t *testing.T) {
 			err := runAnalyze(nil, nil)
 			if (err != nil) != tt.expectError {
 				t.Errorf("runAnalyze() error = %v, expectError %v", err, tt.expectError)
+			}
+
+			// If output was specified, verify the timestamped file was created
+			if tt.setOutput {
+				expectedOutput := formatOutputPath(outputPath)
+				if _, err := os.Stat(expectedOutput); os.IsNotExist(err) {
+					t.Errorf("Expected output file %s was not created", expectedOutput)
+				}
 			}
 		})
 	}

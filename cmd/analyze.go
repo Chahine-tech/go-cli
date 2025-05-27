@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
+	"time"
 
 	parser "loganalyzer/internal/analyzer"
 	"loganalyzer/internal/config"
@@ -13,6 +15,27 @@ var (
 	configPath string
 	outputPath string
 )
+
+func formatOutputPath(path string) string {
+	if path == "" {
+		return ""
+	}
+
+	// Get the directory and filename
+	dir := filepath.Dir(path)
+	filename := filepath.Base(path)
+
+	// Get current date in YYMMDD format
+	timestamp := time.Now().Format("060102") // Go's reference time is 2006-01-02
+
+	// Insert timestamp before the extension
+	ext := filepath.Ext(filename)
+	nameWithoutExt := filename[:len(filename)-len(ext)]
+	newFilename := fmt.Sprintf("%s_%s%s", timestamp, nameWithoutExt, ext)
+
+	// Combine directory and new filename
+	return filepath.Join(dir, newFilename)
+}
 
 var analyzeCmd = &cobra.Command{
 	Use:   "analyze",
@@ -26,6 +49,7 @@ Features:
 - Custom error handling for file access and parsing errors
 - JSON configuration input and optional JSON report output
 - Real-time progress updates and detailed error reporting
+- Automatic timestamp in output filenames (YYMMDD format)
 
 Example usage:
   loganalyzer analyze --config config.json --output report.json
@@ -47,7 +71,7 @@ func runAnalyze(cmd *cobra.Command, args []string) error {
 	fmt.Printf("Loaded configuration with %d log files\n", len(cfg.Logs))
 
 	analyzer := parser.NewAnalyzer(cfg)
-	
+
 	if err := analyzer.AnalyzeAllLogs(); err != nil {
 		return fmt.Errorf("analysis failed: %w", err)
 	}
@@ -56,7 +80,8 @@ func runAnalyze(cmd *cobra.Command, args []string) error {
 	reporter.PrintSummary()
 
 	if outputPath != "" {
-		if err := reporter.SaveToFile(outputPath); err != nil {
+		timestampedPath := formatOutputPath(outputPath)
+		if err := reporter.SaveToFile(timestampedPath); err != nil {
 			return fmt.Errorf("failed to save results: %w", err)
 		}
 	}
@@ -76,9 +101,10 @@ func init() {
 	analyzeCmd.Example = `  # Analyze logs with config file only
   loganalyzer analyze --config config.json
 
-  # Analyze logs and save results to file
+  # Analyze logs and save results to file (with timestamp)
   loganalyzer analyze --config config.json --output report.json
+  # Output will be saved as: YYMMDD_report.json (e.g., 240524_report.json)
 
   # Using short flags
   loganalyzer analyze -c config.json -o report.json`
-} 
+}

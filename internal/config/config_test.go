@@ -7,7 +7,6 @@ import (
 )
 
 func TestLoadConfig(t *testing.T) {
-	// Create a temporary directory for test files
 	tempDir, err := os.MkdirTemp("", "loganalyzer-test")
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
@@ -117,14 +116,12 @@ func TestLoadConfigFileNotFound(t *testing.T) {
 }
 
 func TestLoadConfigInvalidJSON(t *testing.T) {
-	// Create a temporary directory for test files
 	tempDir, err := os.MkdirTemp("", "loganalyzer-test")
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
 	defer os.RemoveAll(tempDir)
 
-	// Create test config file with invalid JSON
 	configPath := filepath.Join(tempDir, "config.json")
 	invalidJSON := `{invalid json}`
 	if err := os.WriteFile(configPath, []byte(invalidJSON), 0644); err != nil {
