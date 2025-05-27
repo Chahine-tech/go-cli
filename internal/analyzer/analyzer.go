@@ -81,7 +81,7 @@ func (a *Analyzer) analyzeLogFile(logConfig config.LogConfig, resultsChan chan<-
 func (a *Analyzer) checkFileAccess(filePath string) error {
 	info, err := os.Stat(filePath)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if errors.Is(err, os.ErrNotExist) {
 			return NewFileNotFoundError(filePath, err)
 		}
 		return NewFileNotFoundError(filePath, fmt.Errorf("file access error: %w", err))
@@ -93,6 +93,9 @@ func (a *Analyzer) checkFileAccess(filePath string) error {
 
 	file, err := os.Open(filePath)
 	if err != nil {
+		if errors.Is(err, os.ErrPermission) {
+			return NewFileNotFoundError(filePath, fmt.Errorf("permission denied: %w", err))
+		}
 		return NewFileNotFoundError(filePath, fmt.Errorf("cannot read file: %w", err))
 	}
 	file.Close()
@@ -104,13 +107,31 @@ func (a *Analyzer) handleFileError(logConfig config.LogConfig, err error) report
 	var fileNotFoundErr *FileNotFoundError
 
 	if errors.As(err, &fileNotFoundErr) {
-		fmt.Printf("✗ File error for log %s: %s\n", logConfig.ID, fileNotFoundErr.Error())
-		return reporter.CreateFailureResult(
-			logConfig.ID,
-			logConfig.Path,
-			"File not found.",
-			fileNotFoundErr.Error(),
-		)
+		if errors.Is(fileNotFoundErr.Err, os.ErrNotExist) {
+			fmt.Printf("✗ File not found for log %s: %s\n", logConfig.ID, fileNotFoundErr.Error())
+			return reporter.CreateFailureResult(
+				logConfig.ID,
+				logConfig.Path,
+				"File not found.",
+				fileNotFoundErr.Error(),
+			)
+		} else if errors.Is(fileNotFoundErr.Err, os.ErrPermission) {
+			fmt.Printf("✗ Permission denied for log %s: %s\n", logConfig.ID, fileNotFoundErr.Error())
+			return reporter.CreateFailureResult(
+				logConfig.ID,
+				logConfig.Path,
+				"Permission denied.",
+				fileNotFoundErr.Error(),
+			)
+		} else {
+			fmt.Printf("✗ File access error for log %s: %s\n", logConfig.ID, fileNotFoundErr.Error())
+			return reporter.CreateFailureResult(
+				logConfig.ID,
+				logConfig.Path,
+				"File access error.",
+				fileNotFoundErr.Error(),
+			)
+		}
 	}
 
 	// Generic file error
@@ -127,13 +148,23 @@ func (a *Analyzer) handleParseError(logConfig config.LogConfig, err error) repor
 	var parseErr *ParseError
 
 	if errors.As(err, &parseErr) {
-		fmt.Printf("✗ Parse error for log %s: %s\n", logConfig.ID, parseErr.Error())
-		return reporter.CreateFailureResult(
-			logConfig.ID,
-			logConfig.Path,
-			"Parse error occurred.",
-			parseErr.Error(),
-		)
+		if errors.Is(parseErr.Err, os.ErrInvalid) {
+			fmt.Printf("✗ Invalid format in log %s: %s\n", logConfig.ID, parseErr.Error())
+			return reporter.CreateFailureResult(
+				logConfig.ID,
+				logConfig.Path,
+				"Invalid log format.",
+				parseErr.Error(),
+			)
+		} else {
+			fmt.Printf("✗ Parse error for log %s: %s\n", logConfig.ID, parseErr.Error())
+			return reporter.CreateFailureResult(
+				logConfig.ID,
+				logConfig.Path,
+				"Parse error occurred.",
+				parseErr.Error(),
+			)
+		}
 	}
 
 	fmt.Printf("✗ Parse error for log %s: %s\n", logConfig.ID, err.Error())
