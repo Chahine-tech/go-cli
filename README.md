@@ -11,6 +11,7 @@ A powerful command-line tool written in Go for concurrent analysis of log files 
 - **CLI Interface**: Built with Cobra framework for intuitive command-line usage
 - **Real-time Progress**: Shows real-time analysis progress and results
 - **Modular Architecture**: Clean separation of concerns with internal packages
+- **Auto Directory Creation**: Automatically creates output directories if they don't exist
 
 ## 📋 Requirements
 
@@ -52,6 +53,9 @@ loganalyzer analyze --config config.json
 
 # Analyze logs and save results to a file
 loganalyzer analyze --config config.json --output report.json
+
+# Save results to nested directories (creates directories automatically)
+loganalyzer analyze --config config.json --output reports/2024/january/analysis.json
 
 # Using short flags
 loganalyzer analyze -c config.json -o report.json

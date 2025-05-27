@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type AnalysisResult struct {
@@ -61,6 +62,11 @@ func (r *Reporter) SaveToFile(outputPath string) error {
 	data, err := json.MarshalIndent(r.results, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal results to JSON: %w", err)
+	}
+
+	dir := filepath.Dir(outputPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directories for %s: %w", outputPath, err)
 	}
 
 	if err := os.WriteFile(outputPath, data, 0644); err != nil {
